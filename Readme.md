@@ -5,7 +5,8 @@
 <b>PASTE THIS INSIDE THAT FILE :- </b>
 
 
-<?xml version="1.0" encoding="UTF-8"?>
+<P>
+  <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 <project path="device/samsung/msm7627a-common" name="marxteen/android_device_msm7627a" remote="github" revision="master" />
 <project path="device/samsung/delos3geur" name="marxteen/delos3geur" remote="github" revision="master" />
@@ -23,4 +24,5 @@ Bluetooth
 <project path="system/bluetooth" name="marxteen/system_bluetooth" revision="cm-13.0" />
 -->
 </manifest>
+</P>
 
