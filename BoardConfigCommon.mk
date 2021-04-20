@@ -23,22 +23,28 @@
 
 LOCAL_PATH := device/samsung/msm7627a-common
 
+LOCAL_C_INCLUDE := $(LOCAL_PATH)/qcom
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
+
 # Inherit from the proprietary version
 -include vendor/samsung/delos3geur/BoardConfigVendor.mk
 
 # Compile sys
 #TARGET_GCC_VERSION_EXP := 4.8
-DISABLE_DEXPREOPT := true
+#DISABLE_DEXPREOPT := true
 
 # Compiler flags
 TARGET_GLOBAL_CFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
-TARGET_SPECIFIC_HEADER_PATH := device/samsung/msm7627a-common/include
-#TARGET_SPECIFIC_HEADER_PATH += 
+TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
+
 # Qualcomm hardware
 BOARD_USES_QCOM_HARDWARE := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE -DNO_TUNNEL_RECORDING
 TARGET_OTA_ASSERT_DEVICE := delos3geur,GT-I8552b,I8552,msm7x27a
+COMMON_GLOBAL_CFLAGS += -Wall -Wno-unused-parameter
+COMMON_GLOBAL_CPPFLAGS += -Wno-error=unused-parameter
 
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := MSM8225
@@ -69,14 +75,18 @@ BOARD_KERNEL_BASE := 0x00200000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 
 #TARGET_KERNEL_CROSS_COMPILE_PREFIX := /opt/toolchains/arm-eabi-4.7/bin/arm-eabi-
+#TARGET_KERNEL_CONFIG := delos_defconfig
 TARGET_KERNEL_CONFIG := gtl8552b_defconfig
 TARGET_KERNEL_SOURCE := kernel/samsung/delos3geur
-PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
-DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_delos
+PRODUCT_COPY_FILES += $(LOCAL_PATH)/rootdir/initlogo_i8552.rle:root/initlogo.rle
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay_delos
+
+# Embed SuperUser
+SUPERUSER_EMBEDDED := true
 
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
-#BOARD_USE_MHEAP_SCREENSHOT := true
+BOARD_USE_MHEAP_SCREENSHOT := true
 TARGET_RUNNING_WITHOUT_SYNC_FRAMEWORK := true
 TARGET_REQUIRES_SYNCHRONOUS_SETSURFACE := true
 
@@ -119,34 +129,34 @@ TARGET_BOOTANIMATION_TEXTURE_CACHE := false
 TARGET_QCOM_MEDIA_VARIANT := caf
 COMMON_GLOBAL_CFLAGS += -DLPA_DEFAULT_BUFFER_SIZE=480
 COMMON_GLOBAL_CFLAGS += -DQCOM_NO_SECURE_PLAYBACK
-#TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
-#COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_MMPARSER
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_MMPARSER
 
 ## Audio
 TARGET_QCOM_AUDIO_VARIANT := caf
-#BOARD_QCOM_VOIP_ENABLED := true
+BOARD_QCOM_VOIP_ENABLED := true
 BOARD_USES_LEGACY_ALSA_AUDIO := true
 #USE_CUSTOM_AUDIO_POLICY := 0
-#USE_LEGACY_AUDIO_POLICY := 1
-#COMMON_GLOBAL_CFLAGS += -DNO_TUNNELED_SOURCE
-#TARGET_HAS_QACT := true
+USE_LEGACY_AUDIO_POLICY := 1
+COMMON_GLOBAL_CFLAGS += -DNO_TUNNELED_SOURCE
+TARGET_HAS_QACT := true
 
 # Charger
-BOARD_CHARGER_RES := device/samsung/msm7627a-common/charger
+BOARD_CHARGER_RES := $(LOCAL_PATH)/charger
 BOARD_BATTERY_DEVICE_NAME := "battery"
 BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_LPM_BOOT_ARGUMENT_NAME := androidboot.bootchg
 BOARD_LPM_BOOT_ARGUMENT_VALUE := true
 
 PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
-#TARGET_FORCE_CPU_UPLOAD := true
-#ENABLE_WEBGL := true
+TARGET_FORCE_CPU_UPLOAD := true
+ENABLE_WEBGL := true
 
 # Misc.
 TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
 
 ## Override healthd HAL
-#BOARD_HAL_STATIC_LIBRARIES := libhealthd.msm7x27a
+BOARD_HAL_STATIC_LIBRARIES := libhealthd.msm7x27a
 
 ## Use device specific modules
 TARGET_PROVIDES_LIBLIGHTS := true
@@ -159,11 +169,11 @@ BOARD_HAVE_BLUETOOTH_CSR := true
 
 # GPS
 #QCOM_GPS_PATH := hardware/qcom/gps
-QCOM_GPS_PATH := device/samsung/msm7627a-common/gps
+QCOM_GPS_PATH := $(LOCAL_PATH)/gps
 BOARD_USES_QCOM_GPS := true
 BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 50000
 BOARD_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
-#BOARD_USES_QCOM_LIBRPC := true
+BOARD_USES_QCOM_LIBRPC := true
 BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := msm7x27a
 
 # GPU
@@ -172,7 +182,7 @@ TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
 # Graphics
 COMMON_GLOBAL_CFLAGS += -DUSE_MDP3
 TARGET_USES_QCOM_BSP := true
-#COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
+COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
 TARGET_GRALLOC_USES_ASHMEM := true
 BOARD_ADRENO_DECIDE_TEXTURE_TARGET := true
 TARGET_NO_COMPAT_GRALLOC_PERFORM := true
@@ -182,11 +192,11 @@ TARGET_USES_ION := true
 COMMON_GLOBAL_CFLAGS += -DHAVE_NEW_GRALLOC
 BOARD_USES_PMEM_ADSP := true
 BOARD_NEEDS_MEMORYHEAPPMEM := true
-TARGET_QCOM_DISPLAY_VARIANT := caf
-#TARGET_QCOM_DISPLAY_VARIANT := legacy
+#TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_QCOM_DISPLAY_VARIANT := legacy
 
 #TARGET_DOESNT_USE_FENCE_SYNC := true
-#BOARD_EGL_CFG := $(LOCAL_PATH)/configs/etc/egl.cfg
+BOARD_EGL_CFG := $(LOCAL_PATH)/configs/etc/egl.cfg
 
 # Camera
 #USE_DEVICE_SPECIFIC_CAMERA := true
@@ -212,23 +222,47 @@ BOARD_WANTS_EMMC_BOOT := true
 # RIL
 #BOARD_USES_LEGACY_RIL := true
 TARGET_RIL_VARIANT := legacy
-#BOARD_PROVIDES_LIBRIL := true
-#BOARD_PROVIDES_RIL_REFERENCE := true
-#BOARD_MOBILEDATA_INTERFACE_NAME := "pdp0"
+BOARD_PROVIDES_LIBRIL := true
+BOARD_PROVIDES_RIL_REFERENCE := true
+BOARD_MOBILEDATA_INTERFACE_NAME := "pdp0"
 COMMON_GLOBAL_CFLAGS += -DRIL_SUPPORTS_SEEK
 COMMON_GLOBAL_CFLAGS += -DRIL_VARIANT_LEGACY
 BOARD_RIL_CLASS := ../../../device/samsung/msm7627a-common/ril/
-#TARGET_NEEDS_BIONIC_PRELINK_SUPPORT := true
+TARGET_NEEDS_BIONIC_PRELINK_SUPPORT := true
 
 # Hardware
-#BOARD_HARDWARE_CLASS := device/samsung/msm7627a-common/cmhw
+BOARD_HARDWARE_CLASS := $(LOCAL_PATH)/cmhw
 
 # Lights
 BOARD_HAVE_GENERIC_BLN := true
 TARGET_PROVIDES_LIBLIGHT := true
 
 # SELinux
-#BOARD_SEPOLICY_DIRS += device/samsung/msm7627a-common/sepolicy
+BOARD_SEPOLICY_DIRS += \
+	$(LOCAL_PATH)/sepolicy
+
+BOARD_SEPOLICY_UNION += \
+       file_contexts \
+       untrusted_app.te \
+       wpa.te \
+       platform_app.te \
+       sysinit.te \
+       zygote.te \
+       system_server.te \
+       system_app.te \
+       qmuxd.te \
+       surfaceflinger.te \
+       vold.te \
+       mediaserver.te \
+       mm-qcamerad.te \
+       bootanim.te \
+       mpdecision.te \
+       radio.te \
+       rmt_storage.te \
+       netmgrd.te \
+       init.te \
+       rild.te \
+       thermal-engine.te
 
 ## Vold
 BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
@@ -245,25 +279,23 @@ TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/
 BOARD_UMS_LUNFILE := "/sys/devices/platform/msm_hsusb/gadget/lun%d/file"
 
 # Recovery
-#TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness\"
+TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness\"
 TARGET_RECOVERY_SWIPE := true
-TARGET_RECOVERY_INITRC := device/samsung/msm7x27a-common/recovery/init.rc
-TARGET_RECOVERY_FSTAB := device/samsung/msm7627a-common/recovery/recovery.fstab
+TARGET_RECOVERY_INITRC := $(LOCAL_PATH)/recovery/init.rc
+TARGET_RECOVERY_FSTAB := $(LOCAL_PATH)/recovery/recovery.fstab
 RECOVERY_FSTAB_VERSION := 2
 BOARD_CUSTOM_RECOVERY_KEYMAPPING := ../../device/samsung/msm7x27a-common/recovery/recovery_keys.c
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-#BOARD_HAS_SDCARD_INTERNAL := true
-#BOARD_HAS_DOWNLOAD_MODE := true
-#BOARD_USES_MMCUTILS := true
-#BOARD_HAS_NO_MISC_PARTITION := true
+BOARD_HAS_SDCARD_INTERNAL := true
+BOARD_HAS_DOWNLOAD_MODE := true
+BOARD_USES_MMCUTILS := true
+BOARD_HAS_NO_MISC_PARTITION := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 BOARD_RECOVERY_SWIPE := true
 #BOARD_SUPPRESS_EMMC_WIPE := true
 COMMON_GLOBAL_CFLAGS += -DNO_SECURE_DISCARD
 DEVICE_RESOLUTION := 480x800
 #BOARD_CUSTOM_GRAPHICS := ../../../device/samsung/msm7627a-common/recovery/graphics.c
-
-
 
 # Wi-Fi CAF
 BOARD_WPA_SUPPLICANT_DRIVER := NL80211
@@ -297,9 +329,8 @@ WIFI_DRIVER_MODULE_AP_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_en
 KERNEL_HAS_FINIT_MODULE := false
 BOARD_GLOBAL_CFLAGS := -DNO_FINIT_MODULE
 
-WITH_DEXPREOPT := true
-   
-#WITH_DEXPREOPT_PIC := true
+WITH_DEXPREOPT := true  
+WITH_DEXPREOPT_PIC := true
 #DONT_DEXPREOPT_PREBUILTS := true
 
 # Final ZIP type
@@ -311,11 +342,9 @@ EXTENDED_FONT_FOOTPRINT := true
 # Enable Minikin text layout engine (will be the default soon)
 USE_MINIKIN := true
 
-
 ## FM Radio
 BOARD_HAVE_QCOM_FM := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED
-
 
 # BUILD FLAGS
 #TARGET_USE_O3 := true

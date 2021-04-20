@@ -23,7 +23,10 @@
 # *not* include it on all devices, so it is safe even with hardware-specific
 # components.
 
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH := device/samsung/msm7627a-common
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
+
+#LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/qcom/include-all
+
 
